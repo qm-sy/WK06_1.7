@@ -1,0 +1,151 @@
+C51 COMPILER V9.60.7.0   EEPROM                                                            02/14/2025 03:26:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM
+OBJECT MODULE PLACED IN ..\Output\hex\eeprom.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Core\Src\eeprom.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
+                    -\Inc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom.lst) OBJ
+                    -ECT(..\Output\hex\eeprom.obj)
+
+line level    source
+
+   1          #include "eeprom.h"
+   2          
+   3          #define EEPROM_Idle     0x00
+   4          #define EEPROM_Read     0x01
+   5          #define EEPROM_Write    0x02
+   6          #define EEPROM_Earse    0x03
+   7          
+   8          #define EEPROM_Enable   0x80        //使能EEPROM操作
+   9          #define EEPROM_Disable  0x00        //禁止EEPROM操作
+  10          
+  11          #define EEPROM_Crl_Time   12        //@11.0592MHz
+  12          
+  13          /**
+  14           * @brief       将单片机设置为ISP空闲状态
+  15           *
+  16           * @param   void
+  17           *
+  18           * @return  
+  19          **/
+  20          static void ISP_Idle()
+  21          {
+  22   1          IAP_CONTR = EEPROM_Disable;     
+  23   1          IAP_CMD   = EEPROM_Idle;        
+  24   1          
+  25   1          /* 每次EEPROM操作前，需要IAP_TRIG先写0x5A，再写 0xA5,不操作则赋0清空  */
+  26   1          IAP_TRIG  = 0X00;              
+  27   1      
+  28   1          IAP_ADDRH = 0X80;               //将地址设置到非IAP区域
+  29   1          IAP_ADDRL = 0X00;               //清空地址低位
+  30   1      }
+  31          
+  32          /**
+  33           * @brief       EEPROM 擦除目标地址所在的一页（1扇区/512字节）
+  34           *
+  35           * @param   addr：目标地址
+  36           *
+  37           * @return  
+  38          **/
+  39          void ISP_Earse( uint16_t addr )
+  40          {   
+  41   1          IAP_CONTR = EEPROM_Enable;       
+  42   1      
+  43   1          IAP_TPS   = EEPROM_Crl_Time;
+  44   1      
+  45   1          IAP_CMD   = EEPROM_Earse;      
+  46   1      
+  47   1          IAP_ADDRL = addr;
+  48   1          IAP_ADDRH = addr>>8;
+  49   1          
+  50   1          /*      发送命令         */
+  51   1          IAP_TRIG  = 0X5A;       
+  52   1          IAP_TRIG  = 0XA5;                                    
+  53   1          
+C51 COMPILER V9.60.7.0   EEPROM                                                            02/14/2025 03:26:49 PAGE 2   
+
+  54   1          delay_ms(10);
+  55   1          
+  56   1          ISP_Idle();
+  57   1      }
+  58          
+  59          /**
+  60           * @brief       EEPROM 写入函数
+  61           *
+  62           * @param   addr：目标地址
+  63           * @param   dat ：写入的值
+  64           *
+  65           * @return  
+  66          **/
+  67          void ISP_Write( uint16_t addr, uint8_t dat )
+  68          {
+  69   1          IAP_CONTR = EEPROM_Enable;
+  70   1      
+  71   1          IAP_TPS   = EEPROM_Crl_Time;
+  72   1      
+  73   1          IAP_CMD   = EEPROM_Write;       
+  74   1      
+  75   1          IAP_ADDRL = addr;
+  76   1          IAP_ADDRH = addr>>8;
+  77   1      
+  78   1          IAP_DATA  = dat;
+  79   1      
+  80   1          /*      发送命令         */
+  81   1          IAP_TRIG  = 0X5A;
+  82   1          IAP_TRIG  = 0XA5;
+  83   1          
+  84   1          delay_ms(10);
+  85   1          
+  86   1          ISP_Idle();
+  87   1      }
+  88          
+  89          /**
+  90           * @brief       EEPROM 读取函数
+  91           *
+  92           * @param   addr：目标地址
+  93           *
+  94           * @return  dat：目标地址对应的值
+  95          **/
+  96          uint8_t ISP_Read( uint16_t addr )
+  97          {
+  98   1          uint8_t dat;
+  99   1          
+ 100   1          IAP_CONTR = EEPROM_Enable;
+ 101   1      
+ 102   1          IAP_TPS   = EEPROM_Crl_Time;
+ 103   1      
+ 104   1          IAP_CMD   = EEPROM_Read;       
+ 105   1      
+ 106   1          IAP_ADDRL = addr;
+ 107   1          IAP_ADDRH = addr>>8;
+ 108   1          
+ 109   1          /*      发送命令         */
+ 110   1          IAP_TRIG  = 0X5A;
+ 111   1          IAP_TRIG  = 0XA5;
+ 112   1          
+ 113   1          delay_ms(10);
+ 114   1          
+ 115   1          dat = IAP_DATA;
+C51 COMPILER V9.60.7.0   EEPROM                                                            02/14/2025 03:26:49 PAGE 3   
+
+ 116   1          
+ 117   1          ISP_Idle();
+ 118   1          
+ 119   1          return dat;
+ 120   1      }
+ 121          
+ 122          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    109    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

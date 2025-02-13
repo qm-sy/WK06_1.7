@@ -1,0 +1,87 @@
+C51 COMPILER V9.60.7.0   TIMER                                                             02/14/2025 03:26:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN ..\Output\hex\timer.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Core\Src\timer.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\
+                    -Inc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\timer.lst) OBJEC
+                    -T(..\Output\hex\timer.obj)
+
+line level    source
+
+   1          /*
+   2                  TIM0:485 超时接收
+   3                  TIM1:加热
+   4                  TIM2:
+   5                  TIM3:485
+   6                  TIM4:串口4
+   7          */
+   8          
+   9          #include "timer.h"
+  10          
+  11          /**
+  12           * @brief       外部中断0初始化函数
+  13           *
+  14           * @param   
+  15           *
+  16           * @return  void
+  17          **/
+  18          void INT0_Init( void )
+  19          {
+  20   1          IT0 = 1;   //下降沿触发过零检测信号
+  21   1          EX0 = 1;
+  22   1      }
+  23          
+  24          /**
+  25           * @brief       Timer0初始化函数
+  26           *
+  27           * @param   
+  28           *
+  29           * @return  void
+  30          **/
+  31          void Timer0_Init( void )         //1ms@11.0592MHz   16位手动重装载
+  32          {
+  33   1              AUXR |= 0x80;                    //定时器时钟1T模式
+  34   1              TMOD &= 0xF0;                    //设置定时器模式
+  35   1              TL0   = 0xCD;                    //设置定时初始值
+  36   1              TH0   = 0xD4;            //设置定时初始值
+  37   1              TF0   = 0;                               //清除TF0标志
+  38   1              TR0   = 1;                               //定时器0开始计时
+  39   1      
+  40   1          ET0   = 1;                           //打开IE-ET0，TIM0中断
+  41   1      }
+  42          
+  43          
+  44          /**
+  45           * @brief       Timer1初始化函数
+  46           *
+  47           * @param   
+  48           *
+  49           * @return  void
+  50          **/
+  51          void Timer1_Init( void )                //10ms@11.0592Mhz   16位手动重装载
+  52          {   
+  53   1              AUXR &= 0xBF;                   //定时器时钟12T模式
+C51 COMPILER V9.60.7.0   TIMER                                                             02/14/2025 03:26:49 PAGE 2   
+
+  54   1              TMOD &= 0x0F;                   //设置定时器模式
+  55   1              TMOD |= 0x10;                   //设置定时器模式   手动/自动开关
+  56   1      }
+  57          
+  58          
+  59          
+  60          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     34    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

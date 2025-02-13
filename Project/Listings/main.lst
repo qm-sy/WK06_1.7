@@ -1,0 +1,77 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              02/14/2025 03:28:57 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN ..\Output\hex\main.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Core\Src\main.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\I
+                    -nc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) OBJECT(
+                    -..\Output\hex\main.obj)
+
+line level    source
+
+   1          #include "main.h"
+   2          
+   3          
+   4          void main( void )
+   5          {
+   6   1          P_SW2 |= 0x80;
+   7   1      
+   8   1          GPIO_Init();
+   9   1      
+  10   1          /*  温度控制  */
+  11   1          ADC_Init();
+  12   1          temp.temp_scan_flag = 1;
+  13   1      
+  14   1          /*  4路220输出控制  */
+  15   1          Power_Statu_Init();
+  16   1          INT0_Init();
+  17   1          Timer1_Init();
+  18   1      
+  19   1          /*  PWM控制  */
+  20   1          PWM_Init();
+  21   1      
+  22   1          /*  485控制  */
+  23   1          Uart3_Init();
+  24   1          Uart3_Send_Statu_Init();
+  25   1          Timer0_Init();
+  26   1      
+  27   1          /*  调试使用  */
+  28   1          Uart4_Init();
+  29   1      
+  30   1          EA = 1;
+  31   1      
+  32   1          /*  eeprom初始化  */
+  33   1          eeprom_statu_judge();
+  34   1          //temp.temp_scan_allow_flag = 1;
+  35   1      
+  36   1          printf("======== code start ========\r\n"); 
+  37   1      
+  38   1          while (1)
+  39   1          {
+  40   2              // temp.temp_value1 =  get_temp(NTC_1);
+  41   2              // temp.temp_value2 =  get_temp(NTC_2);
+  42   2              // temp.temp_value3 =  get_temp(NTC_3);
+  43   2              // printf(" The value of tmep1 is %d \r\n",(int)temp.temp_value1);
+  44   2              // printf(" The value of tmep2 is %d \r\n",(int)temp.temp_value2);
+  45   2              // printf(" The value of tmep3 is %d \r\n",(int)temp.temp_value3);
+  46   2              //temp_scan();
+  47   2              Modbus_Event();
+  48   2          }
+  49   1          
+  50   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+C51 COMPILER V9.60.7.0   MAIN                                                              02/14/2025 03:28:57 PAGE 2   
+
+   CODE SIZE        =     58    ----
+   CONSTANT SIZE    =     31    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,17 @@
+".\Objects\STARTUP.obj",
+".\Objects\adc.obj",
+".\Objects\delay.obj",
+".\Objects\eeprom.obj",
+".\Objects\gpio.obj",
+".\Objects\main.obj",
+".\Objects\pwm.obj",
+".\Objects\timer.obj",
+".\Objects\uart.obj",
+".\Objects\communication.obj",
+".\Objects\eeprom_crl.obj",
+".\Objects\ntc.obj",
+".\Objects\power_crl.obj",
+".\Objects\delay.obj",
+".\Objects\modbus_rtu.obj" 
+TO ".\Objects\WK06_1.7" 
+PRINT(".\Listings\WK06_1.m51") RAMSIZE(256) 

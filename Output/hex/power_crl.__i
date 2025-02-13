@@ -1,0 +1,1 @@
+"..\BSP\Src\power_crl.c" LARGE OPTIMIZE (8,SPEED) BROWSE INCDIR(..\BSP\Inc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\power_crl.lst) OBJECT(..\Output\hex\power_crl.obj)

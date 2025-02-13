@@ -1,0 +1,161 @@
+C51 COMPILER V9.60.7.0   NTC                                                               02/14/2025 03:26:50 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE NTC
+OBJECT MODULE PLACED IN ..\Output\hex\ntc.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\BSP\Src\ntc.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\Inc
+                    -;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\ntc.lst) OBJECT(..\
+                    -Output\hex\ntc.obj)
+
+line level    source
+
+   1          #include "ntc.h"
+   2          
+   3          #define NTCTabNum 126
+   4          
+   5          TEMP temp;
+   6          
+   7          static uint16_t MF52E_tab[NTCTabNum]={
+   8              981,/*0*/           1018,/*1*/      1056,/*2*/      1094,/*3*/      1133,/*4*/    
+   9              1173,/*5*/          1214,/*6*/      1255,/*7*/      1296,/*8*/      1338,/*9*/    
+  10              1381,/*10*/         1424,/*11*/     1467,/*12*/     1511,/*13*/     1555,/*14*/    
+  11              1599,/*15*/         1644,/*16*/     1689,/*17*/     1734,/*18*/     1779,/*19*/    
+  12              1824,/*20*/         1869,/*21*/     1914,/*22*/     1959,/*23*/     2004,/*24*/    
+  13              2048,/*25*/         2093,/*26*/     2137,/*27*/     2181,/*28*/     2225,/*29*/    
+  14              2268,/*30*/         2311,/*31*/     2353,/*32*/     2395,/*33*/     2436,/*34*/    
+  15              2477,/*35*/         2518,/*36*/     2557,/*37*/     2596,/*38*/     2635,/*39*/    
+  16              2673,/*40*/         2710,/*41*/     2747,/*42*/     2782,/*43*/     2818,/*44*/    
+  17              2852,/*45*/         2886,/*46*/     2919,/*47*/     2951,/*48*/     2983,/*49*/    
+  18              3014,/*50*/         3044,/*51*/     3074,/*52*/     3102,/*53*/     3130,/*54*/    
+  19              3158,/*55*/         3184,/*56*/     3210,/*57*/     3236,/*58*/     3260,/*59*/    
+  20              3284,/*60*/         3308,/*61*/     3330,/*62*/     3353,/*63*/     3374,/*64*/    
+  21              3395,/*65*/         3415,/*66*/     3435,/*67*/     3454,/*68*/     3472,/*69*/    
+  22              3490,/*70*/         3508,/*71*/     3525,/*72*/     3541,/*73*/     3557,/*74*/    
+  23              3573,/*75*/         3588,/*76*/     3602,/*77*/     3616,/*78*/     3630,/*79*/    
+  24              3643,/*80*/         3656,/*81*/     3669,/*82*/     3681,/*83*/     3693,/*84*/    
+  25              3704,/*85*/         3715,/*86*/     3725,/*87*/     3735,/*88*/     3745,/*89*/    
+  26              3755,/*90*/         3764,/*91*/     3773,/*92*/     3782,/*93*/     3791,/*94*/    
+  27              3799,/*95*/         3807,/*96*/     3815,/*97*/     3823,/*98*/     3830,/*99*/    
+  28              3837,/*100*/    3844,/*101*/    3851,/*102*/    3857,/*103*/    3863,/*104*/    
+  29              3869,/*105*/    3875,/*106*/    3881,/*107*/    3887,/*108*/    3893,/*109*/    
+  30              3898,/*110*/    3903,/*111*/    3908,/*112*/    3913,/*113*/    3918,/*114*/    
+  31              3923,/*115*/    3928,/*116*/    3932,/*117*/    3936,/*118*/    3941,/*119*/    
+  32              3945,/*120*/    3949,/*121*/    3953,/*122*/    3956,/*123*/    3960,/*124*/    
+  33              3964 /*125*/                                                                                                                                              
+  34          };      
+  35          
+  36          /**
+  37           * @brief 查表 找到adc_val对应的temp
+  38           *
+  39           * @param[in] temp_tab 对照表
+  40           * @param[in] tab_num 表元素个数
+  41           * @param[in] adc_val adc_val
+  42           * 
+  43           * @return  temp
+  44           * 
+  45          **/
+  46          static uint16_t LookupTable( uint16_t *temp_tab, uint8_t tab_num, uint16_t adc_val )
+  47          {
+  48   1                      uint8_t i;
+  49   1              uint16_t temp_val = 0;
+  50   1              
+  51   1                      for( i = 0; i < (tab_num-1); i++ )
+  52   1                      {
+  53   2                                      if(( adc_val >= temp_tab[i] ) && ( adc_val < temp_tab[i+1]) )
+C51 COMPILER V9.60.7.0   NTC                                                               02/14/2025 03:26:50 PAGE 2   
+
+  54   2                                      temp_val = i;   
+  55   2                      }
+  56   1                      return temp_val;
+  57   1      }
+  58          
+  59          /**
+  60           * @brief 取10次adc_val均值对应的temp
+  61           *
+  62           * @param[in] channle_x ntc通道1~4
+  63           * 
+  64           * @return  temp :最终温度
+  65           * 
+  66          **/
+  67          uint16_t get_temp( uint8_t channle_x )
+  68          {
+  69   1          uint8_t t;
+  70   1          uint16_t adc_val = 0;
+  71   1          uint16_t temp;
+  72   1      
+  73   1          /* 1, 取10次adc_val                           */
+  74   1          for( t = 0; t < 10; t++ )
+  75   1                      {
+  76   2                              adc_val += Get_ADC_12bit(channle_x);
+  77   2                  
+  78   2                      }              
+  79   1          adc_val = adc_val/10;
+  80   1          //printf("The average adc_val is %d \r\n",adc_val);
+  81   1          /* 2, 查表，找到对应温度值                     */
+  82   1          temp = LookupTable( MF52E_tab, NTCTabNum, adc_val );
+  83   1          //printf("The temp is %d \r\n",temp);
+  84   1          return temp;
+  85   1      }
+  86          
+  87          /**
+  88           * @brief 温度扫描，1s/次 控制功率开关
+  89           *
+  90           * @param[in] 
+  91           * 
+  92           * @return  
+  93           * 
+  94          **/
+  95          void temp_scan( void )
+  96          {
+  97   1          if( temp.temp_scan_flag == 1)
+  98   1          {
+  99   2              temp.temp_value1 =  get_temp(NTC_1);
+ 100   2              temp.temp_value2 =  get_temp(NTC_2);
+ 101   2              temp.temp_value3 =  get_temp(NTC_3);
+ 102   2      
+ 103   2              if( temp.temp_scan_allow_flag == 1)
+ 104   2              {
+ 105   3                  if( temp.temp_value1 >= temp.temp_alarm_value1 ) 
+ 106   3                  {
+ 107   4                      AC_Out1 = 1;        //001
+ 108   4                  }else
+ 109   3                  {
+ 110   4                      AC_Out1 = 0;
+ 111   4                  }
+ 112   3      
+ 113   3                  if( temp.temp_value2 >= temp.temp_alarm_value2 ) 
+ 114   3                  {
+ 115   4                      AC_Out2 = 1;        //001
+C51 COMPILER V9.60.7.0   NTC                                                               02/14/2025 03:26:50 PAGE 3   
+
+ 116   4                  }else
+ 117   3                  {
+ 118   4                      AC_Out2 = 0;
+ 119   4                  }
+ 120   3      
+ 121   3                  if( temp.temp_value3 >= temp.temp_alarm_value3 ) 
+ 122   3                  {
+ 123   4                      AC_Out3 = 1;        //001
+ 124   4                  }else
+ 125   3                  {
+ 126   4                      AC_Out3 = 0;
+ 127   4                  }
+ 128   3          
+ 129   3              }
+ 130   2              //temp.temp_scan_flag = 0;
+ 131   2          }
+ 132   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    339    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    260      13
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

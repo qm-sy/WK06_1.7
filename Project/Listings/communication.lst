@@ -1,0 +1,168 @@
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/14/2025 03:26:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
+OBJECT MODULE PLACED IN ..\Output\hex\communication.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\BSP\Src\communication.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(
+                    -..\BSP\Inc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\communica
+                    -tion.lst) OBJECT(..\Output\hex\communication.obj)
+
+line level    source
+
+   1          #include "communication.h"
+   2          
+   3          RS485 rs485;
+   4          volatile uint8_t TX4_busy_Flag = 0;
+   5          
+   6          /**
+   7           * @brief       串口3调用结构体 rs485 初始化
+   8           *
+   9           * @param   
+  10           *
+  11           * @return  void
+  12          **/
+  13          void Uart3_Send_Statu_Init( void )
+  14          {
+  15   1          rs485.TX3_busy_Flag = 0;
+  16   1          rs485.RX3_rcv_end_Flag = 0;
+  17   1          rs485.TX3_buf[128] = 0;
+  18   1          rs485.RX3_buf[128] = 0;
+  19   1          rs485.TX3_send_bytelength = 0;
+  20   1          rs485.TX3_send_cnt = 0;
+  21   1          rs485.RX3_rcv_timeout = 0;
+  22   1          rs485.RX3_rcv_cnt = 0;
+  23   1          DR3 = 0;
+  24   1          rs485.send_scan_flag = 0;
+  25   1      }
+  26          
+  27          /**
+  28           * @brief       串口3中断处理函数
+  29           *
+  30           * @param   
+  31           *
+  32           * @return  void
+  33          **/
+  34          void Uart3_ISR() interrupt 17
+  35          {   
+  36   1          /* 1, 检测到硬件将S3TI置1，即发送完毕                       */
+  37   1          if( S3CON & S3TI )          //
+  38   1          {
+  39   2              /* 2, 软件将S3TI清零，等待发送标志位重置，可继续发送    */
+  40   2              S3CON &= ~S3TI;         
+  41   2              rs485.TX3_busy_Flag = 0;
+  42   2              
+  43   2              /* 3, 依次将TX3_buf中数据送出（写S3BUF操作即为发送）    */
+  44   2              if( rs485.TX3_send_bytelength != 0 )
+  45   2              {
+  46   3                  S3BUF = rs485.TX3_buf[rs485.TX3_send_cnt++];
+  47   3                  rs485.TX3_send_bytelength--;
+  48   3              }else
+  49   2              {
+  50   3                  rs485.TX3_send_cnt = 0;
+  51   3                  DR3 = 0;
+  52   3              }
+  53   2          }
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/14/2025 03:26:49 PAGE 2   
+
+  54   1          
+  55   1          /* 1, 检测到硬件将S3RI置1，即接收完毕                       */
+  56   1          if( S3CON & S3RI )
+  57   1          {
+  58   2              /* 2, 软件将S3RI清零，等待接收标志位重置，可继续发送    */
+  59   2              S3CON &= ~S3RI;
+  60   2      
+  61   2              /* 3, 判断数据包是否接收完毕                           */
+  62   2              if( !rs485.RX3_rcv_end_Flag )
+  63   2              {
+  64   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
+  65   3                  if( rs485.RX3_rcv_cnt > 128 )
+  66   3                  {
+  67   4                      rs485.RX3_rcv_cnt = 0;
+  68   4                  }
+  69   3      
+  70   3                  /* 5, 依次将RX3_buf中数据接收（读S2BUF操作即为接收）*/
+  71   3                  rs485.RX3_buf[rs485.RX3_rcv_cnt] = S3BUF;
+  72   3                  rs485.RX3_rcv_cnt++;
+  73   3              }
+  74   2              /* 6, 重置接收完毕判断时间                              */
+  75   2              rs485.RX3_rcv_timeout = 50;
+  76   2          }
+  77   1      }
+  78          
+  79          /**
+  80           * @brief       是否接收完毕判断函数
+  81           *
+  82           * @param   
+  83           *
+  84           * @return  void
+  85          **/
+  86          void Tim0_ISR( void ) interrupt 1   //1ms
+  87          {
+  88   1          /* 1, 如果接收未超时                                             */
+  89   1          if ( rs485.RX3_rcv_timeout != 0 )  
+  90   1          {
+  91   2              rs485.RX3_rcv_timeout--;
+  92   2              /* 2, 如果接收超时                                          */
+  93   2              if( rs485.RX3_rcv_timeout == 0 )  
+  94   2              {
+  95   3                  if( rs485.RX3_rcv_cnt > 0 )  
+  96   3                  {   
+  97   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+  98   4                      rs485.RX3_rcv_end_Flag = 1;    
+  99   4                  }
+ 100   3              }
+ 101   2          } 
+ 102   1      }
+ 103          
+ 104          /**
+ 105           * @brief       串口4中断处理函数
+ 106           *
+ 107           * @param   
+ 108           *
+ 109           * @return  void
+ 110          **/
+ 111          void Uart4_ISR() interrupt 18
+ 112          {
+ 113   1          if (S4CON & S4TI)                //在停止位开始发送时，该位置1
+ 114   1          {
+ 115   2              S4CON &= ~S4TI;                              //清除S4CON寄存器对应S4TI位（该位必须软件清零）
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/14/2025 03:26:49 PAGE 3   
+
+ 116   2              TX4_busy_Flag = 0;
+ 117   2          }
+ 118   1      
+ 119   1          if (S4CON & S4RI)                //串行接收到停止位的中间时刻时，该位置1
+ 120   1          {
+ 121   2              S4CON &= ~S4RI;              //清除S4CON寄存器对应S4RI位（该位必须软件清零） 
+ 122   2          }
+ 123   1      }
+ 124          
+ 125          /**
+ 126           * @brief       串口重定向
+ 127           *
+ 128           * @param   c:字符串
+ 129           *
+ 130           * @return  c
+ 131          **/
+ 132          char putchar(char c)  // 串口重定向需要添加头文件stdio.h
+ 133          {
+ 134   1          S4BUF = c;
+ 135   1          while(TX4_busy_Flag);
+ 136   1          TX4_busy_Flag = 1;
+ 137   1          return c;
+ 138   1      }
+ 139          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    271    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    266    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

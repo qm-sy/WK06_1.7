@@ -1,0 +1,63 @@
+C51 COMPILER V9.60.7.0   PWM                                                               02/14/2025 03:26:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN ..\Output\hex\pwm.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Core\Src\pwm.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\In
+                    -c;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\pwm.lst) OBJECT(..
+                    -\Output\hex\pwm.obj)
+
+line level    source
+
+   1          #include "pwm.h"
+   2          
+   3          #define PWMx_7      7
+   4          #define PWMx_8      8
+   5          
+   6          /**
+   7           * @brief       PWM初始化 Fpwm = SYSclk / (PWMx_PSCR + 1)*(PWMx_ARR + 1)
+   8           *
+   9           * @param   void
+  10           *
+  11           * @return  void
+  12          **/
+  13          void PWM_Init( void )
+  14          {
+  15   1              P_SW2     |= 0X80;  
+  16   1              
+  17   1          PWMB_PS   |= 0x00;          //高级 PWM 通道 PWM7-P2.2  PWM8-P2.3
+  18   1      
+  19   1          PWMB_CCER2 = 0x00;          //清零CC7E、CC8E关闭通道
+  20   1      
+  21   1          PWMB_CCMR3 = 0x70;          //输入捕获n滤波器选择 PWM7
+  22   1          PWMB_CCMR4 = 0x70;          //输入捕获n滤波器选择 PWM8
+  23   1      
+  24   1          PWMB_CCER2 = 0x11;          //配置通道PWM7 & PWM8 输出使能和极性 
+  25   1      
+  26   1          PWMB_ARR   = 0x0451;        //设置自动重装载寄存器值:1105
+  27   1                       
+  28   1          PWMB_PSCR  = 0x0031;        //设置频率   频率越大 波形越平滑  10000/(PWMB_PSCR+1)  200hz
+  29   1      
+  30   1          // PWMB_CCR7  = 0x012C;        //设置PWM7占空比
+  31   1          // PWMB_CCR8  = 0x012C;        //设置PWM8占空比
+  32   1      
+  33   1          PWMB_ENO  |= 0x50;          //使能 PWM7 & PWM8 输出
+  34   1      
+  35   1          PWMB_BKR   = 0x80;          //使能主输出
+  36   1          PWMB_CR1  |= 0x01;          //将CEN2位置1，开始计时        
+  37   1      }
+  38          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     67    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
