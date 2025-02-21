@@ -70,8 +70,9 @@ void eeprom_data_init( void )
     uint8_t led2_statu;
     /*    PWM7、PWM8 风速及开关状态初始化    */
     eeprom.pwm_info = ISP_Read(PWM_ADDR_EEPROM);
-    PWMB_CCR7 = ((eeprom.pwm_info) & 0x0F)*184;
-    PWMB_CCR8 = (eeprom.pwm_info>>4)*184;
+    PWMB_CCR7 = eeprom.pwm_info*184;
+    PWMB_CCR8 = eeprom.pwm_info*184;
+    
 
     /*    LED开关状态初始化    */
     eeprom.led_info = ISP_Read(LED_ADDR_EEPROM);

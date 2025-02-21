@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   UART                                                              02/14/2025 03:26:49 PAGE 1   
+C51 COMPILER V9.60.7.0   UART                                                              02/21/2025 16:52:32 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE UART
 OBJECT MODULE PLACED IN ..\Output\hex\uart.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Core\Src\uart.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\I
-                    -nc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\uart.lst) OBJECT(
-                    -..\Output\hex\uart.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Core\Src\uart.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\Inc;
+                    -..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\uart.lst) OBJECT(..\
+                    -Output\hex\uart.obj)
 
 line level    source
 

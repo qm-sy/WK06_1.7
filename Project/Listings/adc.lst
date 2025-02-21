@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   ADC                                                               02/14/2025 03:26:49 PAGE 1   
+C51 COMPILER V9.60.7.0   ADC                                                               02/21/2025 16:52:32 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ADC
 OBJECT MODULE PLACED IN ..\Output\hex\adc.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Core\Src\adc.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\In
-                    -c;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\adc.lst) OBJECT(..
-                    -\Output\hex\adc.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Core\Src\adc.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\Inc;.
+                    -.\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\adc.lst) OBJECT(..\Ou
+                    -tput\hex\adc.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   1              //printf("The adc_val is %d \r\n",adc_value);
   52   1              return adc_value;       
   53   1      }
-C51 COMPILER V9.60.7.0   ADC                                                               02/14/2025 03:26:49 PAGE 2   
+C51 COMPILER V9.60.7.0   ADC                                                               02/21/2025 16:52:32 PAGE 2   
 
 
 

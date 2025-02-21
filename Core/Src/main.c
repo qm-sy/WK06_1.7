@@ -1,6 +1,5 @@
 #include "main.h"
 
-
 void main( void )
 {
     P_SW2 |= 0x80;
@@ -9,13 +8,13 @@ void main( void )
 
     /*  温度控制  */
     ADC_Init();
-    temp.temp_scan_flag = 1;
+    temp.temp_scan_flag = 0;
 
     /*  4路220输出控制  */
     Power_Statu_Init();
     INT0_Init();
     Timer1_Init();
-
+    Timer2_Init();
     /*  PWM控制  */
     PWM_Init();
 
@@ -30,11 +29,21 @@ void main( void )
     EA = 1;
 
     /*  eeprom初始化  */
-    eeprom_statu_judge();
+    //eeprom_statu_judge();
     //temp.temp_scan_allow_flag = 1;
 
     printf("======== code start ========\r\n"); 
-
+    if(P05 == 1)
+    {
+        my_address = 0x18;
+    }
+    else if(P06 == 1)
+    {
+        my_address = 0x19;
+    }else
+    {
+        my_address = 0x17;
+    }
     while (1)
     {
         // temp.temp_value1 =  get_temp(NTC_1);
@@ -43,7 +52,7 @@ void main( void )
         // printf(" The value of tmep1 is %d \r\n",(int)temp.temp_value1);
         // printf(" The value of tmep2 is %d \r\n",(int)temp.temp_value2);
         // printf(" The value of tmep3 is %d \r\n",(int)temp.temp_value3);
-        temp_scan();
+        //temp_scan();
         Modbus_Event();
     }
     

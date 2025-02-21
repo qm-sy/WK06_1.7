@@ -97,36 +97,35 @@ void temp_scan( void )
     if( temp.temp_scan_flag == 1)
     {
         temp.temp_value1 =  get_temp(NTC_1);
-        temp.temp_value2 =  get_temp(NTC_2);
-        temp.temp_value3 =  get_temp(NTC_3);
-
-        if( temp.temp_scan_allow_flag == 1)
+        // temp.temp_value2 =  get_temp(NTC_2);
+        // temp.temp_value3 =  get_temp(NTC_3);
+        // if( temp.temp_scan_allow_flag == 1)
+        // {
+        if( temp.temp_value1 >= temp.temp_alarm_value1 ) 
         {
-            if( temp.temp_value1 >= temp.temp_alarm_value1 ) 
-            {
-                AC_Out1 = 1;        //001
-            }else
-            {
-                AC_Out1 = 0;
-            }
-
-            if( temp.temp_value2 >= temp.temp_alarm_value2 ) 
-            {
-                AC_Out2 = 1;        //001
-            }else
-            {
-                AC_Out2 = 0;
-            }
-
-            if( temp.temp_value3 >= temp.temp_alarm_value3 ) 
-            {
-                AC_Out3 = 1;        //001
-            }else
-            {
-                AC_Out3 = 0;
-            }
-    
+            AC_Out1 = AC_Out2 = AC_Out3 = AC_Out4 = 1;        //001
+        }else
+        {
+            AC_Out1 = AC_Out2 = AC_Out3 = AC_Out4 = 0;
         }
-        //temp.temp_scan_flag = 0;
+
+            // if( temp.temp_value2 >= temp.temp_alarm_value2 ) 
+            // {
+            //     AC_Out2 = 1;        //001
+            // }else
+            // {
+            //     AC_Out2 = 0;
+            // }
+
+            // if( temp.temp_value3 >= temp.temp_alarm_value3 ) 
+            // {
+            //     AC_Out3 = 1;        //001
+            // }else
+            // {
+            //     AC_Out3 = 0;
+            // }
+    
+        //}
+        temp.temp_scan_flag = 0;
     }
 }

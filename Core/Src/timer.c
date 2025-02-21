@@ -55,6 +55,24 @@ void Timer1_Init( void )		//10ms@11.0592Mhz   16位手动重装载
 	TMOD |= 0x10;       		//设置定时器模式   手动/自动开关
 }
 
+/**
+ * @brief	Timer1初始化函数
+ *
+ * @param   
+ *
+ * @return  void
+**/
+void Timer2_Init( void )		//10毫秒@11.0592MHz
+{
+	AUXR &= 0xFB;			//定时器时钟12T模式
+	T2L = 0x00;				//设置定时初始值
+	T2H = 0xDC;				//设置定时初始值
+	AUXR |= 0x10;			//定时器2开始计时
+
+	IE2 |= 0X04;
+}
+
+
 
 
 

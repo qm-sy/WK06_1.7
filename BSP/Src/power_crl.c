@@ -21,6 +21,9 @@ AC_220 ac_220;
 void Power_Statu_Init( void )
 {
     ac_220.zero_flag  = 0;
+    ac_220.channel1_flag = 0;
+    ac_220.channel2_flag = 0;
+    ac_220.channel3_flag = 0;
     AC_Out1 = AC_Out2 = AC_Out3 = AC_Out4 = 1;
 }
 
@@ -57,7 +60,18 @@ void Tim1_ISR( void ) interrupt 3   //1ms
     if( ac_220.zero_flag == 1 )
     {
         ac_220.zero_flag = 0;
-        AC_Out1 = AC_Out2 = AC_Out3 = AC_Out4 = 0;
+        if(ac_220.channel1_flag == 1)
+        {
+            AC_Out1 = 0;
+        }
+        if(ac_220.channel2_flag == 1)
+        {
+            AC_Out2 = 0;
+        }
+        if(ac_220.channel3_flag == 1)
+        {
+            AC_Out3 = 0;
+        }
 
          /* 2, 设置下一次Timer1中断触发所需时间，即脉冲时间       */
         TL1 = 0xF7;				

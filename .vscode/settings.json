@@ -1,0 +1,12 @@
+{
+    "files.exclude": {
+        "**/.vscode": true
+    },
+    "files.associations": {
+        "common.h": "c",
+        "timer.h": "c",
+        "main.h": "c",
+        "sys.h": "c",
+        "modbus_rtu.h": "c"
+    }
+}

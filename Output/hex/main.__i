@@ -1,1 +1,0 @@
-"..\Core\Src\main.c" LARGE OPTIMIZE (8,SPEED) BROWSE INCDIR(..\BSP\Inc;..\Core\Inc;..\Drivers;..\Emembed\Inc;..\Middlewares;..\SYSTEM) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) OBJECT(..\Output\hex\main.obj)

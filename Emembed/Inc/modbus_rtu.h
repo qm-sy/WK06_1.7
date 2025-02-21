@@ -9,7 +9,7 @@
 #include "eeprom_crl.h"
 #include "delay.h"
 
-#define MY_ADDR     0x48
+#define MY_ADDR     0x17
 
 typedef struct 
 {
@@ -23,6 +23,7 @@ typedef struct
 
 
 extern MODBIS_INFO modbus;
+extern volatile uint8_t my_address;
 
 void Modbus_Event( void );
 void Modbus_Fun3( void );

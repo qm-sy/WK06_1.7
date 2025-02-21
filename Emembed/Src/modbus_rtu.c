@@ -1,7 +1,7 @@
 #include "modbus_rtu.h"
 
 MODBIS_INFO modbus;
-
+volatile uint8_t my_address = 0;
 /**
  * @brief	modbus_rtu  无奇偶校验
  *
@@ -30,7 +30,7 @@ void Modbus_Event( void )
         if( crc == rccrc )
         {
             /*6.地址域校验通过，进入相应功能函数进行处理      */
-            if( rs485.RX3_buf[0] == MY_ADDR )
+            if( rs485.RX3_buf[0] == my_address )
             {
                 switch ( rs485.RX3_buf[1] )
                 {
@@ -67,12 +67,12 @@ void Modbus_Event( void )
 void Modbus_Fun3( void )
 {
     uint16_t i;
-
+    uint8_t  channel;
     modbus.send_value_addr  = 3;                 //DATA1 H 位置
     modbus.byte_cnt   = (rs485.RX3_buf[4]<<8 | rs485.RX3_buf[5]) *2;
     modbus.start_addr = rs485.RX3_buf[2]<<8 | rs485.RX3_buf[3];
 
-    rs485.TX3_buf[0]  = MY_ADDR;                //Addr
+    rs485.TX3_buf[0]  = my_address;                //Addr
     rs485.TX3_buf[1]  = 0x03;                   //Fun
     rs485.TX3_buf[2]  = modbus.byte_cnt;        //Byte Count
 
@@ -85,42 +85,44 @@ void Modbus_Fun3( void )
             /*  40001  两路PWM 开关状态及风速查询                 */
             case 0:
                 modbus.byte_info_H  = 0X00;
-                modbus.byte_info_L |= ((PWMB_CCR7 / 184) | (PWMB_CCR8 / 184)<<4);   //PWM7\8风速
+                //modbus.byte_info_L |= ((PWMB_CCR7 / 184) | (PWMB_CCR8 / 184)<<4);   //PWM7\8风速
+                modbus.byte_info_L |= PWMB_CCR7 / 184;
                 break;
 
-            /*  40002  LED开关状态查询                          */
+            /*  40002  220v开关状态查询                          */
             case 1:
-                modbus.byte_info_H = 0X00;
-                if( DC_24V_1 == 0 )
+                modbus.byte_info_H = (ac_220.time_delay - 58000) / 75;   
+                channel = ac_220.channel1_flag | (ac_220.channel2_flag<<1) | (ac_220.channel3_flag<<2);
+                switch (channel)
                 {
-                    modbus.byte_info_L |= 0x01;                              //LED开关状态
-                }
-                if( DC_24V_2 == 0 )
-                {
-                    modbus.byte_info_L |= 0x10;                              //LED开关状态
-                }
-                break;
+                    case 0:
+                        modbus.byte_info_L = 0x05;    
+                        break;
+                    
+                    case 1:
+                        modbus.byte_info_L = 0x00;    
+                        break;
 
-            /*  40003  220V CH4开关状态及功率查询               */
-            case 2:
-                modbus.byte_info_H = 0X00;
-                modbus.byte_info_L = ((ac_220.time_delay - 58000) / 75)<<1;  //220V 功率
-                if( EX0 & 0x01 )
-                {
-                    modbus.byte_info_L |= 0x01;                             //220V运行状态
+                    case 2:
+                        modbus.byte_info_L = 0x01;    
+                        break;
+
+                    case 3:
+                        modbus.byte_info_L = 0x03;    
+                        break;
+
+                    case 4:
+                        modbus.byte_info_L = 0x02;    
+                        break;
+
+                    case 7:
+                        modbus.byte_info_L = 0x04;    
+                        break;
+
+                    default:
+                        break;
                 }
-                break;
-
-            /*  40004 NTC1 NTC2 alarm value查询                       */
-            case 3:
-                modbus.byte_info_H = temp.temp_alarm_value2;           
-                modbus.byte_info_L = temp.temp_alarm_value1;           
-                break;
-
-            /*  40005 NTC3 alarm value查询                            */
-            case 4:
-                modbus.byte_info_H = 0X00;   
-                modbus.byte_info_L = temp.temp_alarm_value3;          
+                
                 break;
 
             default:
@@ -148,7 +150,7 @@ void Modbus_Fun4( void )
     modbus.byte_cnt   = (rs485.RX3_buf[4]<<8 | rs485.RX3_buf[5]) *2;
     modbus.start_addr = rs485.RX3_buf[2]<<8 | rs485.RX3_buf[3];
 
-    rs485.TX3_buf[0]  = MY_ADDR;                //Addr
+    rs485.TX3_buf[0]  = my_address;                //Addr
     rs485.TX3_buf[1]  = 0x04;                   //Fun
     rs485.TX3_buf[2]  = modbus.byte_cnt;        //Byte Count
 
@@ -161,34 +163,7 @@ void Modbus_Fun4( void )
             /*  30001 NTC1 NTC2温度查询                     */
             case 0:
                 modbus.byte_info_L = get_temp(NTC_1);
-                modbus.byte_info_H = get_temp(NTC_2);     
-                break;
-
-            /*  30002 NTC3 NTC4温度查询                     */    
-            case 1:
-                modbus.byte_info_L = get_temp(NTC_3);
-                modbus.byte_info_H = get_temp(NTC_4);
-                break;
-
-            /*    30003 2路IR查询                         */
-            case 2:    
-                modbus.byte_info_H = 0xaa;
-                modbus.byte_info_L = 0xbb;
-                break;
-
-            /*    30004 I_OUT1 I_OUT2 电流查询              */
-            case 3:    
-                // modbus.byte_info_H = get_current(I_OUT2);     
-                // modbus.byte_info_L = get_current(I_OUT1); 
                 modbus.byte_info_H = 0x00;     
-                modbus.byte_info_L = 0x00;    
-                break;
-
-            /*    30005 I_OUT3 电流查询                     */
-            case 4:    
-                modbus.byte_info_H = 0X00;                    
-                //modbus.byte_info_L = get_current(I_OUT3); 
-                modbus.byte_info_L = 0x00;    
                 break;
 
             default:
@@ -324,8 +299,8 @@ void Modbus_Fun16( void )
 {
     uint16_t crc;
     uint16_t i;
-    uint8_t led1_statu;
-    uint8_t led2_statu;
+//    uint8_t led1_statu;
+//    uint8_t led2_statu;
 
     modbus.rcv_value_addr = 7;                  //DATA1 H位置
     modbus.byte_cnt   = rs485.RX3_buf[6];
@@ -341,52 +316,57 @@ void Modbus_Fun16( void )
         {
             /*  40001  两路PWM 开关状态及风速设置                 */
             case 0:
-                PWMB_CCR7 = (modbus.byte_info_L & 0x0F)*184;
-                PWMB_CCR8 = (modbus.byte_info_L>>4)*184;
+                PWMB_CCR7 = modbus.byte_info_L *184;
+                PWMB_CCR8 = modbus.byte_info_L *184;
 
                 eeprom.pwm_info = modbus.byte_info_L;
                 break;
             
             /*  40002  24V LED开关状态设置                          */
             case 1:
-                led1_statu = 1 - modbus.byte_info_L & 0X01;
-                led2_statu = 1 - ((modbus.byte_info_L >> 4) & 0X01);
+                AC_220V_out(modbus.byte_info_H);
 
-                DC_24V_out(led1_statu,led2_statu);
-
-                eeprom.led_info = modbus.byte_info_L;
-                break;
-
-            /*  40003  220V 开关及大小设置                          */
-            case 2:
-                if( modbus.byte_info_L & 0X01 )
+                switch (modbus.byte_info_L)
                 {
-                    EX0 = 1;
-                }else
-                {
-                    EX0 = 0;
+                    case 0:
+                        ac_220.channel1_flag = 1;
+                        ac_220.channel2_flag = 0;
+                        ac_220.channel3_flag = 0;
+                        break;
+                    
+                    case 1:
+                        ac_220.channel1_flag = 0;
+                        ac_220.channel2_flag = 1;
+                        ac_220.channel3_flag = 0;
+                        break;
+
+                    case 2:
+                        ac_220.channel1_flag = 0;
+                        ac_220.channel2_flag = 0;
+                        ac_220.channel3_flag = 1;
+                        break;
+
+                    case 3:
+                        ac_220.channel1_flag = 1;
+                        ac_220.channel2_flag = 1;
+                        ac_220.channel3_flag = 0;
+                        break;
+
+                    case 4:
+                        ac_220.channel1_flag = 1;
+                        ac_220.channel2_flag = 1;
+                        ac_220.channel3_flag = 1;
+                        break;
+                    
+                    case 5:
+                        ac_220.channel1_flag = 0;
+                        ac_220.channel2_flag = 0;
+                        ac_220.channel3_flag = 0;
+                        break;
+                    default:
+                        break;
                 }
 
-                AC_220V_out(modbus.byte_info_L>>1);
-
-                eeprom.ac220_info = modbus.byte_info_L;
-                break;
-
-            /*  40004  NTC1 NTC2 alarm value 设置                   */
-            case 3:
-                temp.temp_alarm_value1 = modbus.byte_info_L;
-                temp.temp_alarm_value2 = modbus.byte_info_H;
-                
-
-                eeprom.temp_alarm_value1 = temp.temp_alarm_value1;
-                eeprom.temp_alarm_value2 = temp.temp_alarm_value2;
-                break;
-
-            /*  40005  NTC3 alarm value 设置                        */
-            case 4:
-                temp.temp_alarm_value3 = modbus.byte_info_L;
-
-                eeprom.temp_alarm_value3 = temp.temp_alarm_value3;
                 break;
 
             default:
@@ -405,7 +385,7 @@ void Modbus_Fun16( void )
     delay_ms(5);
     S3CON |= S3TI;  
 
-    eeprom_data_record();                      //记录更改后的值
+    //eeprom_data_record();                      //记录更改后的值
 }
 
 /**
@@ -469,44 +449,3 @@ void slave_to_master(uint8_t length)
     delay_ms(5);
     S3CON |= S3TI;                                  //开始发送
 }
-
-// void slave_scan( void )
-// {
-//     uint8_t send_buf[12];
-//     uint16_t crc;
-//     if( rs485.send_scan_flag == 1)
-//     {
-//         send_buf[0] = 0x35;
-//         send_buf[1] = 0x03;
-//         send_buf[2] = temp.temp_value1;
-//         send_buf[3] = temp.temp_value2;
-//         send_buf[4] = temp.temp_value3;
-//         send_buf[5] = get_current(I_OUT1); 
-//         send_buf[6] = get_current(I_OUT2); 
-//         send_buf[7] = get_current(I_OUT3); 
-//         send_buf[8] = ((PWMB_CCR8/184)<<4 | (PWMB_CCR8/184));
-//         if( INTCLKO & 0x10 )
-//         {
-//             send_buf[9] = 0x01;                             //220V运行状态
-//         }else
-//         {
-//             send_buf[9] = 0x00;
-//         }
-//         send_buf[10]= (uint8_t)((ac_220.time_delay-58000)/75);
-
-//         crc = MODBUS_CRC16(send_buf,11);
-    
-//         send_buf[11] = crc>>8;
-//         send_buf[12] = crc;
-    
-//         memcpy(rs485.TX3_buf,send_buf,13);
-    
-//         rs485.TX3_send_bytelength = 13;
-//         DR3 = 1;                                        //485可以发送
-//         delay_ms(5);
-//         S3CON |= S3TI;                                  //开始发送
-
-//         rs485.send_scan_flag = 0;
-//         //DR3 = 0;
-//     }  
-// }

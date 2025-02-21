@@ -487,6 +487,11 @@
               <FileType>1</FileType>
               <FilePath>..\Emembed\Src\modbus_rtu.c</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Emembed\Src\common.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
