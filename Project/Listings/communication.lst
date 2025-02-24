@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/21/2025 16:52:33 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/22/2025 15:16:45 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
@@ -62,7 +62,7 @@ line level    source
   51   3                  DR3 = 0;
   52   3              }
   53   2          }
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/21/2025 16:52:33 PAGE 2   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/22/2025 15:16:45 PAGE 2   
 
   54   1          
   55   1          /* 1, 检测到硬件将S3RI置1，即接收完毕                       */
@@ -126,7 +126,7 @@ line level    source
  113   1          if (S4CON & S4TI)                //在停止位开始发送时，该位置1
  114   1          {
  115   2              S4CON &= ~S4TI;                              //清除S4CON寄存器对应S4TI位（该位必须软件清零）
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/21/2025 16:52:33 PAGE 3   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     02/22/2025 15:16:45 PAGE 3   
 
  116   2              TX4_busy_Flag = 0;
  117   2          }

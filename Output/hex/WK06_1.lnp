@@ -1,0 +1,17 @@
+"..\Output\hex\STARTUP.obj",
+"..\Output\hex\adc.obj",
+"..\Output\hex\eeprom.obj",
+"..\Output\hex\gpio.obj",
+"..\Output\hex\main.obj",
+"..\Output\hex\pwm.obj",
+"..\Output\hex\timer.obj",
+"..\Output\hex\uart.obj",
+"..\Output\hex\communication.obj",
+"..\Output\hex\eeprom_crl.obj",
+"..\Output\hex\ntc.obj",
+"..\Output\hex\power_crl.obj",
+"..\Output\hex\delay.obj",
+"..\Output\hex\modbus_rtu.obj",
+"..\Output\hex\common.obj" 
+TO "..\Output\hex\WK06_1.7" 
+PRINT(".\Listings\WK06_1.m51") RAMSIZE(256) 

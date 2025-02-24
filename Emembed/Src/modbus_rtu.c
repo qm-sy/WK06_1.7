@@ -297,7 +297,7 @@ void Modbus_Fun6( void )
 **/
 void Modbus_Fun16( void )
 {
-    uint16_t crc;
+    //uint16_t crc;
     uint16_t i;
 //    uint8_t led1_statu;
 //    uint8_t led2_statu;
@@ -319,7 +319,7 @@ void Modbus_Fun16( void )
                 PWMB_CCR7 = modbus.byte_info_L *184;
                 PWMB_CCR8 = modbus.byte_info_L *184;
 
-                eeprom.pwm_info = modbus.byte_info_L;
+                //eeprom.pwm_info = modbus.byte_info_L;
                 break;
             
             /*  40002  24V LED开关状态设置                          */
@@ -375,15 +375,15 @@ void Modbus_Fun16( void )
         modbus.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
     }
     
-    crc = MODBUS_CRC16(rs485.TX3_buf,6);
-    rs485.TX3_buf[6] = crc>>8;                 //CRC H
-    rs485.TX3_buf[7] = crc;                    //CRC L
+    // crc = MODBUS_CRC16(rs485.TX3_buf,6);
+    // rs485.TX3_buf[6] = crc>>8;                 //CRC H
+    // rs485.TX3_buf[7] = crc;                    //CRC L
 
-    rs485.TX3_send_bytelength = 8;
+    // rs485.TX3_send_bytelength = 8;
 
-    DR3 = 1;                                   //485可以发送
-    delay_ms(5);
-    S3CON |= S3TI;  
+    // DR3 = 1;                                   //485可以发送
+    // delay_ms(5);
+    // S3CON |= S3TI;  
 
     //eeprom_data_record();                      //记录更改后的值
 }

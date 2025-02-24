@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         02/21/2025 16:52:33 PAGE 1   
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         02/22/2025 15:16:45 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE POWER_CRL
@@ -62,7 +62,7 @@ line level    source
   51           * @brief       Timer1中断处理函数
   52           *
   53           * @param   
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         02/21/2025 16:52:33 PAGE 2   
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         02/22/2025 15:16:45 PAGE 2   
 
   54           *
   55           * @return  void
@@ -126,7 +126,7 @@ line level    source
  112   1          {
  113   2              DC_24V_1 = 0;
  114   2          }else
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         02/21/2025 16:52:33 PAGE 3   
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         02/22/2025 15:16:45 PAGE 3   
 
  115   1          {
  116   2              DC_24V_1 = 1;
